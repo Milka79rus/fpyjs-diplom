@@ -5,22 +5,84 @@
  * Имеет свойства ACCESS_TOKEN и lastCallback
  * */
 class VK {
-
-  static ACCESS_TOKEN = '958eb5d439726565e9333aa30e50e0f937ee432e927f0dbd541c541887d919a7c56f95c04217915c32008';
-  static lastCallback;
+  static ACCESS_TOKEN = localStorage.getItem('vk_access_token') || '';
+  static lastCallback = () => { };
 
   /**
-   * Получает изображения
-   * */
-  static get(id = '', callback){
-
+   * Метод для получения/проверки токена
+   */
+  static getToken() {
+    if (!this.ACCESS_TOKEN || this.ACCESS_TOKEN === 'null') {
+      const token = prompt('Введите ваш VK ACCESS_TOKEN:');
+      if (token) {
+        this.ACCESS_TOKEN = token;
+        localStorage.setItem('vk_access_token', token);
+      }
+    }
+    return this.ACCESS_TOKEN;
   }
 
   /**
-   * Передаётся в запрос VK API для обработки ответа.
-   * Является обработчиком ответа от сервера.
+   * Получает изображения профиля
    */
-  static processData(result){
+  static get(id = '', callback) {
+    // 1. Сохраняем колбек в свойство lastCallback
+    this.lastCallback = callback;
+    const token = this.getToken();
 
+    if (!token) {
+      alert('Токен не введен!');
+      return;
+    }
+
+    // 2. Создаем тег script для JSONP
+    const script = document.createElement('script');
+    script.classList.add('vk-jsonp-script');
+
+    // 3. Настраиваем тег на запрос получения фото (album_id=profile)
+    // Указываем callback=VK.processData, как просит инструкция
+    script.src = `https://api.vk.com/method/photos.get?owner_id=${id}&album_id=profile&extended=1&photo_sizes=1&access_token=${token}&v=5.131&callback=VK.processData`;
+
+    // 4. Добавляем созданный скрипт в тело документа
+    document.body.appendChild(script);
+  }
+
+  /**
+   * Обработчик ответа от сервера
+   */
+  static processData(result) {
+    // 1. Чтобы документ не засорялся, находим и удаляем тег script
+    const script = document.querySelector('.vk-jsonp-script');
+    if (script) {
+      script.remove();
+    }
+
+    // 2. В случае ошибки выводим alert и завершаем выполнение
+    if (result.error) {
+      alert(`Ошибка VK: ${result.error.error_msg}`);
+      this.lastCallback([]); 
+      this.lastCallback = () => { }; 
+      return;
+    }
+
+    // 3. Находим самые крупные изображения
+    const images = result.response.items.map(item => {
+      // Сравниваем размеры по площади
+      const largest = item.sizes.reduce((prev, curr) => {
+        return (curr.width * curr.height > prev.width * prev.height) ? curr : prev;
+      });
+
+      return {
+        src: largest.url,
+        likes: item.likes.count,
+        date: item.date
+      };
+    });
+
+    // Передаем изображения в сохраненный колбек
+    this.lastCallback(images);
+
+    // 4. Обновляем свойство lastCallback на функцию "пустышку"
+    this.lastCallback = () => { };
   }
 }
