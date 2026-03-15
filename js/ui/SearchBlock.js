@@ -20,7 +20,6 @@ class SearchBlock {
     const input = this.element.querySelector('input');
     const replaceButton = this.element.querySelector('.button.replace');
     const addButton = this.element.querySelector('.button.add');
-    const previewButton = document.querySelector('.show-uploaded-files');
 
     if (replaceButton) {
       // Обработчик для кнопки "Заменить"
@@ -29,7 +28,10 @@ class SearchBlock {
         // 2.1. Проверка поля ввода (если пустое — ничего не делаем)
         if (id) {
           // 2.2. Выполняем запрос через VK.get (подсказка 2)
-          VK.get(id, (photos) => {
+          VK.get(id, (err, photos) => {
+            if (err) {
+              return; // Если есть ошибка, выходим (alert уже сработал в VK.js)
+            }
             // 2.3. Удаляем ранее отрисованные изображения (подсказка 3)
             App.imageViewer.clear();
             // Отрисовываем полученные изображения
@@ -47,7 +49,10 @@ class SearchBlock {
         // 2.1. Проверка поля ввода
         if (id) {
           // 2.2. Выполняем запрос
-          VK.get(id, (photos) => {
+          VK.get(id, (err, photos) => {
+            if (err) {
+              return;
+            }
             // 2.3. Для кнопки "Добавить" очистка не нужна, только отрисовка
             App.imageViewer.drawImages(photos);
           });

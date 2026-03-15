@@ -13,11 +13,13 @@ class Yandex {
     // Пытаемся взять токен из localStorage
     let token = localStorage.getItem('yandex_token');
 
-    // Если его там нет или он пустой — спрашиваем у пользователя
+    // Исправлено: проверяем на существование и на строку 'null'
     if (!token || token === 'null') {
       token = prompt('Введите ваш Yandex OAuth-токен:');
       if (token) {
         localStorage.setItem('yandex_token', token);
+      } else {
+        return null; // Пользователь нажал "Отмена"
       }
     }
     return token;
@@ -40,7 +42,7 @@ class Yandex {
       headers: {
         Authorization: `OAuth ${token}`
       },
-      callback: callback
+      callback: (err, response) => callback(err, response)
     });
   }
 
@@ -58,7 +60,7 @@ class Yandex {
       headers: {
         Authorization: `OAuth ${token}`
       },
-      callback: callback
+      callback: (err, response) => callback(err, response)
     });
   }
 
@@ -75,7 +77,7 @@ class Yandex {
       headers: {
         Authorization: `OAuth ${token}`
       },
-      callback: callback
+      callback: (err, response) => callback(err, response)
     });
   }
 

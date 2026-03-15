@@ -76,20 +76,21 @@ class FileUploaderModal extends BaseModal {
    */
   getImageHTML(item) {
     const src = typeof item === 'string' ? item : item.src;
+    // Данные теперь приходят корректно из ImageViewer
     const fileName = item.likes ? `${item.likes}_${item.date}.jpg` : '';
     return `
-    <div class="image-preview-container" style="display: inline-block; vertical-align: top; width: 250px; margin: 10px; padding: 10px; border: 1px solid #eee; border-radius: 8px; background: #fff;">
-      <div style="height: 180px; width: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #f9f9f9; border-radius: 4px;">
-        <img src='${src}' style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+    <div class="image-preview-container uploader-image-container">
+      <div class="image-wrapper">
+        <img src='${src}' class="uploader-preview-img" />
       </div>
       
-      <div class="ui action input fluid" style="margin-top: 10px;">
-        <input type="text" placeholder="Имя файла" value="${fileName}" style="padding: 8px;">
+      <div class="ui action input fluid">
+        <input type="text" placeholder="Имя файла" value="${fileName}">
         <button class="ui icon button"><i class="upload icon"></i></button>
       </div>
 
-      <div class="ui progress" style="margin-top: 8px; margin-bottom: 0; height: 12px; background: #e0e0e0; border-radius: 6px; overflow: hidden;">
-        <div class="bar" style="transition: width 300ms ease; width: 0%; height: 100%; background: #21ba45;"></div>
+      <div class="ui progress">
+        <div class="bar"></div>
       </div>
     </div>
   `;
@@ -126,12 +127,10 @@ class FileUploaderModal extends BaseModal {
     progressBlock.classList.remove('success'); // сбрасываем старые статусы
     bar.style.width = '10%';
 
-    Yandex.uploadFile(path, url, (err) => {
+    Yandex.uploadFile(path, url, (err, response) => {
       if (!err) {
-        // Успех: заполняем на 100% и добавляем класс успеха
         bar.style.width = '100%';
         progressBlock.classList.add('success');
-
 
         setTimeout(() => {
           imageContainer.remove();
@@ -140,7 +139,6 @@ class FileUploaderModal extends BaseModal {
           }
         }, 500);
       } else {
-        // Ошибка: сбрасываем прогресс и возвращаем доступ к полю
         bar.style.width = '0%';
         inputBlock.classList.remove('disabled');
         inputBlock.classList.add('error');

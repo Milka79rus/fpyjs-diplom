@@ -57,13 +57,16 @@ class PreviewModal extends BaseModal {
    * Отрисовывает изображения в блоке всплывающего окна
    */
   showImages(data) {
-    // Защита от null или undefined
-    if (!data || !data.items) {
+    // 1. Извлекаем список файлов (проверяем все возможные варианты ответа API)
+    const items = data._embedded ? data._embedded.items : (data.items || data);
+
+    // 2. Если файлов нет или это не массив — выводим сообщение
+    if (!items || !Array.isArray(items) || items.length === 0) {
       this.content.innerHTML = '<div class="ui message">Список файлов пуст или недоступен</div>';
       return;
     }
 
-    const items = data.items;
+    // 3. Если всё хорошо, то отрисовываем
     const html = items
       .reverse()
       .map((item) => this.getImageInfo(item))
@@ -92,8 +95,7 @@ class PreviewModal extends BaseModal {
    * Возвращает разметку из изображения, таблицы с описанием данных изображения и кнопок контроллеров (удаления и скачивания)
    */
   getImageInfo(item) {
-    const imageSrc = item.preview ? item.preview : item.file;
-
+    const imageSrc = item.file;
     return `
       <div class="image-preview-container">
         <img src='${imageSrc}' />
@@ -105,7 +107,7 @@ class PreviewModal extends BaseModal {
             <tr>
               <td>${item.name}</td>
               <td>${this.formatDate(item.created)}</td>
-              <td>${(item.size / 1024).toFixed(1)}Кб</td>
+              <td>${(item.size / 1024).toFixed(1)} Кб</td>
             </tr>
           </tbody>
         </table>

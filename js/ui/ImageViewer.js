@@ -5,13 +5,13 @@
 class ImageViewer {
   constructor(element) {
     this.element = element;
-    this.previewImage = element.querySelector('.ui.fluid.image');
+    this.previewImage = document.querySelector('.ui.fluid.image');
     this.imagesList = element.querySelector('.images-list .grid .row:first-of-type');
 
     // Кнопки для управления
-    this.selectAllButton = element.querySelector('.select-all');
-    this.sendButton = element.querySelector('.send');
-    this.showUploadedButton = element.querySelector('.show-uploaded-files');
+    this.selectAllButton = document.querySelector('.select-all');
+    this.sendButton = document.querySelector('.send');
+    this.showUploadedButton = document.querySelector('.show-uploaded-files');
 
     this.registerEvents();
   }
@@ -60,21 +60,21 @@ class ImageViewer {
 
     // Просмотр загруженных файлов 
     this.showUploadedButton.addEventListener('click', () => {
-      const modal = App.getModal('filePreviewer'); 
+      const modal = App.getModal('filePreviewer');
 
       if (modal) {
-        modal.element.querySelector('.content').innerHTML = '<i class="asterisk loading icon massive"></i>';
         modal.open();
+        modal.element.querySelector('.content').innerHTML = '<i class="asterisk loading icon massive"></i>';
 
-        // Исправляем колбэк: принимаем (error, response)
         Yandex.getUploadedFiles((err, response) => {
           if (err) {
-            alert('Ошибка при получении файлов с Яндекса');
+            alert('Ошибка при получении файлов: ' + err);
             modal.close();
             return;
           }
-          // Передаем в showImages именно response 
-          modal.showImages(response);
+          // ИСПРАВЛЕНО: передаем только массив файлов, учитывая структуру Яндекса
+          const files = response?._embedded?.items || response?.items || response;
+          modal.showImages(files);
         });
       }
     });

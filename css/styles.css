@@ -1,6 +1,6 @@
 /* General */
 
-body {	
+body {
   position: relative;
   background: radial-gradient(#641775, #0e0033);
   background-color: #0e0033;
@@ -22,8 +22,12 @@ body::after {
   z-index: 0;
 }
 
-h1, h2, h3, h4, h5 {
-  font-family: 'Play','Helvetica Neue',Arial,Helvetica,sans-serif;
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: 'Play', 'Helvetica Neue', Arial, Helvetica, sans-serif;
   color: #593565;
 }
 
@@ -32,7 +36,8 @@ h2 {
 }
 
 
-.ui.container, .ui.grid {
+.ui.container,
+.ui.grid {
   position: relative;
   z-index: 1;
 }
@@ -67,7 +72,7 @@ h2 {
   width: 100%;
 }
 
-.ui.grid > .row.images-wrapper {
+.ui.grid>.row.images-wrapper {
   justify-content: space-between;
 }
 
@@ -156,6 +161,54 @@ i.icon.asterisk.loading {
   justify-content: space-around;
 }
 
-.uploaded-previewer-modal .image-preview-container .ui.labeled.icon.button > .icon {
+.uploaded-previewer-modal .image-preview-container .ui.labeled.icon.button>.icon {
   background: none;
+}
+
+/* Обновленные стили для модалки загрузки файлов */
+
+.file-uploader-modal .image-preview-container.uploader-image-container {
+  display: inline-block;
+  vertical-align: top;
+  width: 250px;
+  margin: 10px;
+  padding: 15px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.uploader-image-container .image-wrapper {
+  height: 180px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #f9f9f9;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.uploader-preview-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.uploader-image-container .ui.progress {
+  margin-top: 10px;
+  margin-bottom: 0;
+  height: 12px;
+}
+
+.uploader-image-container .ui.progress .bar {
+  transition: width 300ms ease;
+  height: 100%;
+}
+
+/* Фикс для инпутов внутри контейнера */
+.uploader-image-container .ui.action.input input {
+  padding: 8px !important;
 }

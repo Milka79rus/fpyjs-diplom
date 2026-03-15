@@ -59,9 +59,11 @@ class VK {
 
     // 2. В случае ошибки выводим alert и завершаем выполнение
     if (result.error) {
-      alert(`Ошибка VK: ${result.error.error_msg}`);
-      this.lastCallback([]); 
-      this.lastCallback = () => { }; 
+      const errorMsg = `Ошибка VK: ${result.error.error_msg}`;
+      alert(errorMsg);
+      // Вызываем колбек по стандарту (err, response)
+      this.lastCallback(new Error(errorMsg), null);
+      this.lastCallback = () => { };
       return;
     }
 
@@ -80,7 +82,7 @@ class VK {
     });
 
     // Передаем изображения в сохраненный колбек
-    this.lastCallback(images);
+    this.lastCallback(null, images);
 
     // 4. Обновляем свойство lastCallback на функцию "пустышку"
     this.lastCallback = () => { };
